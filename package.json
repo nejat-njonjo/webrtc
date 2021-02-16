@@ -4,7 +4,7 @@
   "description": "Video conference, video call, phone call",
   "main": "server.js",
   "scripts": {
-    "start": "node ./server.js && peerjs --port 3001",
+    "start": "node ./server.js",
     "dev": "nodemon ./server.js",
     "peer": "peerjs --port 3001"
   },
