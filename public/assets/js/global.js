@@ -56,6 +56,7 @@
 
 //   peers[userId] = call
 // }
+
 function fetchData(url, method, data = null) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
@@ -82,3 +83,39 @@ function fetchData(url, method, data = null) {
     }
   })
 }
+
+
+
+window.addEventListener('load', async function(e) {
+  const urlSegments = window.location.pathname.split('/')
+  const rootPath = urlSegments[1]
+  const restricted = ['home', 'classroom', 'user', 'rooms']
+
+  try {
+    const user = JSON.parse(localStorage.getItem('session'))
+
+    const session = await fetchData(`/session/${user._id}`, 'POST')
+
+    if (restricted.includes(rootPath)) {
+      if (!session.success) {
+        window.location.href = '/'
+      }
+    } else {
+      if (session.success) {
+        window.location.href = '/home'
+      }
+    }
+  } catch (error) {
+    window.location.href = '/'
+  }
+})
+
+const lc = new RTCPeerConnection()
+const dc = lc.createDataChannel('channel')
+
+dc.onmessage = e => console.log(e.data)
+dc.onopen = e => console.log('connection opened')
+
+lc.onicecandidate = e => console.log(JSON.stringify(lc.localDescription))
+
+lc.createOffer().then(offer => lc.setLocalDescription(offer)).then(result => console.log('sets'))
