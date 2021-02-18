@@ -164,6 +164,8 @@ window.addEventListener('load', () => {
 const axios = require('axios')
 const socket = io('/')
 
+window.axios = axios
+
 on('submit', '#classroom-form', function (e) {
   e.preventDefault()
   const form = {}
