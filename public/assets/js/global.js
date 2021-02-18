@@ -118,12 +118,3 @@ window.addEventListener('load', async function(e) {
   }
 })
 
-const lc = new RTCPeerConnection()
-const dc = lc.createDataChannel('channel')
-
-dc.onmessage = e => console.log(e.data)
-dc.onopen = e => console.log('connection opened')
-
-lc.onicecandidate = e => console.log(JSON.stringify(lc.localDescription))
-
-lc.createOffer().then(offer => lc.setLocalDescription(offer)).then(result => console.log('sets'))
