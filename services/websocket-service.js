@@ -7,12 +7,18 @@ class WebSockerService {
 
   createConnection(ioServer) {
     ioServer.on('connection', socket => {
-      this.filterEvents(ioServer, socket)
+      this.filterEvents(socket)
     })
   }
 
-  filterEvents(ioServer, socket) {
-    console.log('connected')
+  filterEvents(socket) {
+    socket.on('sendOffer', offer => {
+      socket.broadcast.emit('receiveOffer', offer)
+    })
+
+    socket.on('sendAnswer', answer => {
+      socket.broadcast.emit('recieveAnswer', answer)
+    })
   }
 }
 
