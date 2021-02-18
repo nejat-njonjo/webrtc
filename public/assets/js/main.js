@@ -161,24 +161,47 @@ window.addEventListener('load', () => {
   aos_init();
 });
 
-const axios = require('axios')
 const socket = io('/')
 
-window.axios = axios
-
-on('submit', '#classroom-form', function (e) {
-  e.preventDefault()
-  const form = {}
-  const inputs = e.target.querySelectorAll('input')
-
-  for (input of inputs) {
-    form[input.id] = input.value
+socket.on('receiveOffer', offer => {
+  const remoteCandidate = new RTCPeerConnection()
+  remoteCandidate.onicecandidate = e => {
+    socket.emit('sendAnswer', JSON.stringify(remoteCandidate.localDescription))
   }
-  const description = e.target.querySelector('textarea')
-  form['description'] = description.value
+  remoteCandidate.ondatachannel = e => {
+    remoteCandidate.dataChannel = e.channel;
+    remoteCandidate.dataChannel.onmessage = e => {
+      console.log('new message', e.data)
+    }
+    remoteCandidate.dataChannel.onopen = e => {
+      console.log('connection open')
+    }
+  }
+  remoteCandidate.setRemoteDescription(JSON.parse(offer))
+    .then(a => console.log('offer set'))
+  remoteCandidate.createAnswer()
+    .then(answer => {
+      remoteCandidate.setLocalDescription(answer)
+        .then(a => console.log('answer creates'))
+    })
+})
 
-  const request = axios.post('/classroom', form)
-  request.then(response => {
-    console.log(response.data)
-  })
+const localCandidate = new RTCPeerConnection()
+const dataChannel = localCandidate.createDataChannel('channel')
+
+dataChannel.onmessage = e => {
+  console.log('here', e.data)
+}
+
+dataChannel.onopen = e => console.log('connection opened')
+
+localCandidate.onicecandidate = e => {
+  socket.emit('sendOffer', JSON.stringify(localCandidate.localDescription))
+}
+
+localCandidate.createOffer()
+  .then(offer => localCandidate.setLocalDescription(offer))
+
+socket.on('recieveAnswer', answer => {
+  localCandidate.setRemoteDescription(JSON.parse(answer))
 })
