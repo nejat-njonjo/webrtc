@@ -1,0 +1,108 @@
+<%- include('partials/header.ejs') %>
+<style>
+.main {
+  display: flex;
+  justify-content: center;
+  height: calc(90vh - 30px);
+  flex-direction: column;
+  align-items: center;
+}
+.login-form {
+  max-width: 320px;
+  margin: auto;
+}
+.form-group {
+  margin: 10px 0px;
+}
+.form-footer {
+  margin-top: 20px;
+}
+.has-error, .has-error .form-control {
+  border-color: red;
+  color: red;
+}
+.form-group .error {
+  display: none;
+}
+.has-error.show-error .error {
+  display: block;
+}
+.hide {
+  display: none;
+}
+</style>
+
+<div class="main">
+  <div class="col-md-6 col-sm-12">
+    <div class="login-form">
+      <form id="register-form">
+        <b>Create account</b>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="name" class="form-control" minlength="6" placeholder="Name" required>
+        </div>
+        <div id="username-wrapper" class="form-group">
+          <label>User Name <small class="error">: User already exists</small></label>
+          <input type="text" id="username" class="form-control" placeholder="User Name" minlength="3" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" class="form-control" minlength="5" placeholder="Password" required>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" id="submit" class="btn btn-primary">Register</button>
+          <a href="/login" class="button" class="btn btn-secondary">Login</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/scripts.ejs') %>
+
+<script>
+  const form = document.querySelector('#register-form')
+  form.addEventListener('submit', function(e) {
+    e.preventDefault()
+    const inputs = form.querySelectorAll('input')
+
+    const formData = {}
+
+    for (input of inputs) {
+      formData[input.id] = input.value
+    }
+
+    fetchData('/user', 'POST', formData).then(response => {
+      window.location.href = '/home'
+    }).catch(error => {
+      console.log(error)
+    })
+  })
+
+  const usernameWrapper = form.querySelector('#username-wrapper')
+  const btnSubmit = form.querySelector("#submit")
+
+  form.querySelector('#username').addEventListener('keyup', function(e) {
+    const username = e.target.value
+    const maxlength = parseInt(e.target.attributes.minlength.value)
+
+    if (username.length >= maxlength) {
+      fetchData(`/user?username=${username}`, 'GET').then(response => {
+        if (response.length > 0) {
+          usernameWrapper.classList.add('has-error')
+          usernameWrapper.classList.add('show-error')
+          btnSubmit.setAttribute('disabled', true)
+        } else {
+          usernameWrapper.classList.remove('has-error')
+          usernameWrapper.classList.remove('show-error')
+          btnSubmit.removeAttribute('disabled')
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+  })
+</script>
+
+<%- include('partials/footer.ejs') %>
