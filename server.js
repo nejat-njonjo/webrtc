@@ -2,28 +2,13 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
-const {v4: uuid} = require('uuid')
+const routes = require('./routes')
+const WebSocketService = require('./services/websocket-service')
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
-app.get('/', (req, res) => {
-  res.redirect(`/${uuid()}`)
-})
-
-app.get('/:room', (req, res) => {
-  res.render('room', {roomId: req.params.room})
-})
-
-io.on('connection',  socket => {
-  socket.on('join-room', (roomId, userId) => {
-    socket.join(roomId)
-    socket.to(roomId).broadcast.emit('user-connected', userId)
-
-    socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userId)
-    })
-  })
-})
+app.get('/', routes)
+new WebSocketService(io)
 
 server.listen(process.env.PORT || '3000')
