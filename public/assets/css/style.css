@@ -35,8 +35,27 @@ h5,
 h6 {
   font-family: "Nunito", sans-serif;
 }
-button {
+
+button, .btn-primary {
+  background: #4154f1;
+  padding: 8px 20px;
+  margin-left: 30px;
+  border-radius: 4px;
+  color: #fff;
   border: none;
+}
+
+a:not(footer a) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0 10px 30px;
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #013289;
+  white-space: nowrap;
+  transition: 0.3s;
 }
 
 /*--------------------------------------------------------------
@@ -46,7 +65,12 @@ section {
   padding: 60px 0;
   overflow: hidden;
 }
-
+.hide {
+  display: none;
+}
+.show {
+  display: block;
+}
 .section-header {
   text-align: center;
   padding-bottom: 40px;
