@@ -35,15 +35,42 @@ async function checkUser(req, res) {
 
 async function login(req, res) {
   try {
-    const user = await userModel.find(req.body)
-    console.log(user)
+    const user = await userModel.row(req.body)
+
+    if (user) {
+      const update = await userModel.update(user.username, { status: 'online' })
+      if (update.nModified > 0 || update.ok > 0) {
+        res.send({ success: true, data: user })
+      } else {
+        res.send({ success: false })
+      }
+    } else {
+      res.send({success: false})
+    }
   } catch (error) {
     res.send({ error: 'Login error' })
+  }
+}
+
+async function isLoggedIn(req, res) {
+  try {
+    const {_id} = req.params
+    const user = await userModel.row({_id, status: 'online'})
+
+    if (!user) {
+      res.send({success: false})
+      return
+    }
+
+    res.send({success: true})
+  } catch (error) {
+    res.send(false)
   }
 }
 
 module.exports = Object.freeze({
   createUser,
   checkUser,
-  login
+  login,
+  isLoggedIn
 })
