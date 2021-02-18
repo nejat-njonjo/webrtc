@@ -1,17 +1,4 @@
-const db = require('./db')
-
-const UserSchema = new db.Schema({
-  name: String,
-  username: String,
-  password: String,
-  status: {
-    type: String,
-    default: 'online'
-  },
-  role: String
-})
-
-const userModel = db.model('user', UserSchema)
+const userModel = require('./user-schema')
 
 async function create(payload) {
   const result = await userModel.create(payload)
