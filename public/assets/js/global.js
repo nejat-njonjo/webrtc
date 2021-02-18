@@ -84,29 +84,37 @@ function fetchData(url, method, data = null) {
   })
 }
 
-
+function redirect(path) {
+  window.location.href = path
+}
 
 window.addEventListener('load', async function(e) {
   const urlSegments = window.location.pathname.split('/')
   const rootPath = urlSegments[1]
   const restricted = ['home', 'classroom', 'user', 'rooms']
-
+  const free = ['', 'login', 'register']
   try {
     const user = JSON.parse(localStorage.getItem('session'))
 
-    const session = await fetchData(`/session/${user._id}`, 'POST')
+    if (user) {
+      const session = await fetchData(`/session/${user._id}`, 'POST')
+      
+      if (!session.success && restricted.includes(rootPath)) {
+        localStorage.removeItem('session')
+        redirect('/')
+      }
 
-    if (restricted.includes(rootPath)) {
-      if (!session.success) {
-        window.location.href = '/'
+      if (session.success && free.includes(rootPath)) {
+        redirect('/home')
       }
     } else {
-      if (session.success) {
-        window.location.href = '/home'
+      if (restricted.includes(rootPath)) {
+        redirect('/')
       }
     }
   } catch (error) {
-    window.location.href = '/'
+    localStorage.removeItem('session')
+    redirect('/')
   }
 })
 
