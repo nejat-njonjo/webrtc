@@ -1,0 +1,23 @@
+<%- include('partials/header.ejs') %>
+<%- include('partials/nav.ejs') %>
+<style>
+.main {
+  display: flex;
+  justify-content: center;
+  height: calc(100vh - 100px);
+  flex-direction: column;
+  align-items: center;
+}
+.main .controllers {
+  margin: auto;
+}
+</style>
+<div class="main">
+  <div class="controllers">
+    <button class="getstarted scrollto">Create a room</button>
+    <button class="getstarted scrollto">Join room</button>
+  </div>
+</div>
+<%- include('partials/scripts.ejs') %>
+
+<%- include('partials/footer.ejs') %> 
