@@ -15,7 +15,6 @@ class WebSockerService {
     socket.on('userJoinRoom', payload => {
       socket.join(payload.roomData.key)
       socket.to(payload.roomData.key).broadcast.emit('userJoinedRoom', payload)
-      // socket.broadcast.emit('receiveOffer', offer)
     })
 
     socket.on('sendAnswer', answer => {
