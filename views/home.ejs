@@ -8,25 +8,52 @@
   flex-direction: column;
   align-items: center;
 }
-.main .controllers {
+.main .room-creator {
   margin: auto;
 }
-#video-grid {
-  display: grid;
-}
-video {
-  height: 250px;
-  width: 250px;
-  object-fit: cover;
-}
+
 </style>
 <div class="main">
-  <div id="video-grid"></div>
-  <div class="controllers">
-    <button class="getstarted scrollto">Create a room</button>
-    <button class="getstarted scrollto">Join room</button>
+  <div class="room-creator">
+    <form id="room-form">
+      <div class="form-group">
+        <input type="text" name="className" id="class" class="form-control" placeholder="Class name" required>
+      </div>
+      <div class="form-group">
+        <input type="text" name="subject" id="subject" class="form-control" placeholder="Subject name" required>
+      </div>
+      <div class="form-group">
+        <input type="text" name="topic" id="subject" class="form-control" placeholder="Tpoic" required>
+      </div>
+      <div class="form-group">
+        <input type="text" name="description" id="description" class="form-control" placeholder="Description" required>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-success" type="submit">Create</button>
+      </div>
+    </form>
   </div>
 </div>
 <%- include('partials/scripts.ejs') %>
+<script>
+const form = document.getElementById('room-form')
+const inputs = form.querySelectorAll('input')
+const formData = {}
 
+form.addEventListener('submit', function(ev) {
+  ev.preventDefault()
+
+  for (let input of inputs) {
+    formData[input.id] = input.value
+  }
+
+  formData['user'] = JSON.parse(localStorage.getItem('session'))
+
+  fetchData('/rooms', 'POST', formData)
+    .then(response => {
+      response.host = formData.user
+      redirect(`/rooms/${response.key}`)
+    })
+})
+</script>
 <%- include('partials/footer.ejs') %> 
