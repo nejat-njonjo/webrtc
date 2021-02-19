@@ -31,9 +31,9 @@ router.get('/register', (req, res) => {
 router.post('/user', userController.createUser)
 router.get('/user', userController.checkUser)
 
-router.post('/classroom', (req, res) => {
-  res.send(req.body)
-})
+router.post('/rooms', classroomController.createRoom)
+router.get('/rooms', classroomController.getRooms)
+router.get('/rooms/:roomKey', classroomController.getHostRoom)
 
 router.post('/session/:_id', userController.isLoggedIn)
 

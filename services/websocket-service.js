@@ -12,8 +12,10 @@ class WebSockerService {
   }
 
   filterEvents(socket) {
-    socket.on('sendOffer', offer => {
-      socket.broadcast.emit('receiveOffer', offer)
+    socket.on('userJoinRoom', payload => {
+      socket.join(payload.roomData.key)
+      socket.to(payload.roomData.key).broadcast.emit('userJoinedRoom', payload)
+      // socket.broadcast.emit('receiveOffer', offer)
     })
 
     socket.on('sendAnswer', answer => {
