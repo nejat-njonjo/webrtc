@@ -163,7 +163,7 @@ window.addEventListener('load', () => {
 
 const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
-const localPeer = new Peer(undefined)
+const localPeer = new Peer()
 const peers = {}
 
 const localVideo = document.createElement('video')
