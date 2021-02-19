@@ -11,8 +11,17 @@
 .main .controllers {
   margin: auto;
 }
+#video-grid {
+  display: grid;
+}
+video {
+  height: 250px;
+  width: 250px;
+  object-fit: cover;
+}
 </style>
 <div class="main">
+  <div id="video-grid"></div>
   <div class="controllers">
     <button class="getstarted scrollto">Create a room</button>
     <button class="getstarted scrollto">Join room</button>
