@@ -8,14 +8,79 @@
   flex-direction: column;
   align-items: center;
 }
+video {
+  height: 250px;
+  width: 250px;
+  object-fit: cover;
+}
 </style>
 
 <div class="main">
-
+  <div id="video-grid"></div>
 </div>
-
+<%- include('partials/scripts.ejs') %> 
 <script>
   const ROOM_ID = "<%= roomId %>"
+  const roomData = JSON.parse('<%- JSON.stringify(room) %>')
+  
+  document.addEventListener('DOMContentLoaded', e => {
+    const socket = io('/')
+    const videoGrid = document.getElementById('video-grid')
+    const localPeer = new Peer()
+    const peers = {}
+
+    const localVideo = document.createElement('video')
+    localVideo.muted = true
+
+    function addVideoStream(video, stream) {
+      video.srcObject = stream
+      video.addEventListener('loadedmetadata', () => {
+        video.play()
+      })
+
+      videoGrid.append(video)
+    }
+
+    function connectToRemotePeer(userId, stream) {
+      const call = localPeer.call(userId, stream)
+      const video = document.createElement('video')
+
+      call.on('stream', remoteStream => {
+        console.log(remoteStream)
+        addVideoStream(video, remoteStream)
+      })
+      call.on('close', () => {
+        video.remove()
+      })
+
+      peers[userId] = call
+    }
+
+    /**
+     * Join the room
+     */
+    localPeer.on('open', offer => {
+      socket.emit('userJoinRoom', {roomData, offer})
+    })
+
+    navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    }).then(stream => {
+      addVideoStream(localVideo, stream)
+
+      localPeer.on('call', call => {
+        call.answer(stream)
+        const video = document.createElement('video')
+        call.on('stream', localStream => {
+          addVideoStream(video, localStream)
+        })
+      })
+
+      socket.on('userJoinedRoom', data => {
+        connectToRemotePeer(data.offer, stream)
+      })
+    })
+  })
 </script>
-<%- include('partials/scripts.ejs') %> 
 <%- include('partials/footer.ejs') %> 
