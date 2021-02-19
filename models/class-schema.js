@@ -5,7 +5,7 @@ const AttendantSchema = new db.Schema({
 })
 
 const ClassroomSchema = new db.Schema({
-  class: String,
+  className: String,
   subject: String,
   status: {
     type: String,
@@ -21,6 +21,6 @@ const ClassroomSchema = new db.Schema({
   key: String
 })
 
-const classroomModel = db.model('classroom', ClassroomSchema)
+const classroomModel = db.model('Classroom', ClassroomSchema)
 
 module.exports = classroomModel
