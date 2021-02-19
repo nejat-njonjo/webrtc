@@ -118,3 +118,13 @@ window.addEventListener('load', async function(e) {
   }
 })
 
+function closeCamera() {
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(mediaStream => {
+      mediaStream.getTracks()[0].stop
+    })
+}
+
+function test() {
+  console.log('u')
+}
