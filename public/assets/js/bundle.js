@@ -162,60 +162,6 @@ window.addEventListener('load', () => {
   aos_init();
 });
 
-const socket = io('/')
-const videoGrid = document.getElementById('video-grid')
-const localPeer = new Peer()
-const peers = {}
-
-const localVideo = document.createElement('video')
-localVideo.muted = true
-
-localPeer.on('open', id => {
-  socket.emit('sendOffer', id)
-})
-
-function addVideoStream(video, stream) {
-  video.srcObject = stream
-  video.addEventListener('loadedmetadata', () => {
-    video.play()
-  })
-
-  videoGrid.append(video)
-}
-
-function connectToRemotePeer(userId, stream) {
-  const call = localPeer.call(userId, stream)
-  const video = document.createElement('video')
-  
-  call.on('stream', remoteStream => {
-    console.log(remoteStream)
-    addVideoStream(video, remoteStream)
-  })
-  call.on('close', () => {
-    video.remove()
-  })
-
-  peers[userId] = call
-}
-
-navigator.mediaDevices.getUserMedia({
-  video: true,
-  audio: true
-}).then(stream => {
-  addVideoStream(localVideo, stream)
-
-  localPeer.on('call', call => {
-    call.answer(stream)
-    const video = document.createElement('video')
-    call.on('stream', localStream => {
-      addVideoStream(video, localStream)
-    })
-  })
-
-  socket.on('receiveOffer', peerId => {
-    connectToRemotePeer(peerId, stream)
-  })
-})
 
 
 

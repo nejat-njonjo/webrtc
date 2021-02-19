@@ -10,6 +10,6 @@ const UserSchema = new db.Schema({
   }
 })
 
-const userModel = db.model('user', UserSchema)
+const userModel = db.model('User', UserSchema)
 
 module.exports = userModel
