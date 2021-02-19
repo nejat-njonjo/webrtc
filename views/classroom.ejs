@@ -1,21 +1,20 @@
 <%- include('partials/header.ejs') %>
-<%- include('partials/nav.ejs') %>
 <style>
-.main {
-  display: flex;
-  justify-content: center;
-  height: calc(100vh - 100px);
-  flex-direction: column;
-  align-items: center;
+.main,body,html {
+  margin: 0px;
+  padding:0;
+  overflow:hidden;
 }
 video {
-  height: 250px;
-  width: 250px;
+  height: calc(100vh);
+  width: 100vw;
+  display:block;
   object-fit: cover;
 }
 </style>
 
 <div class="main">
+  <div id="host-video"></div>
   <div id="video-grid"></div>
 </div>
 <%- include('partials/scripts.ejs') %> 
@@ -29,37 +28,48 @@ video {
     const localPeer = new Peer()
     const peers = {}
 
+    const host = document.querySelector('#host-video')
+
     const localVideo = document.createElement('video')
     localVideo.muted = true
 
-    function addVideoStream(video, stream) {
+    function addVideoStream(video, stream, target = 'common') {
       video.srcObject = stream
       video.addEventListener('loadedmetadata', () => {
         video.play()
       })
 
-      videoGrid.append(video)
+      if (target !== 'common') {
+        host.append(video)
+      } else {
+        videoGrid.append(video)
+      }
     }
 
-    function connectToRemotePeer(userId, stream) {
-      const call = localPeer.call(userId, stream)
+    function connectToRemotePeer(data, stream) {
+      const call = localPeer.call(data.offer, stream)
       const video = document.createElement('video')
 
       call.on('stream', remoteStream => {
-        console.log(remoteStream)
+        if (data.roomData.host._id === data.roomData.client._id) {
+          addVideoStream(video, remoteStream, 'host')
+        }
         addVideoStream(video, remoteStream)
       })
       call.on('close', () => {
         video.remove()
       })
 
-      peers[userId] = call
+      peers[data.offer] = call
     }
 
     /**
      * Join the room
      */
     localPeer.on('open', offer => {
+      Object.assign(roomData, {
+        client: JSON.parse(localStorage.getItem('session'))
+      })
       socket.emit('userJoinRoom', {roomData, offer})
     })
 
@@ -68,19 +78,22 @@ video {
       audio: true
     }).then(stream => {
       addVideoStream(localVideo, stream)
+      const session = JSON.parse(localStorage.getItem('session'))
 
       localPeer.on('call', call => {
         call.answer(stream)
         const video = document.createElement('video')
         call.on('stream', localStream => {
+          console.log(session)
           addVideoStream(video, localStream)
         })
       })
 
       socket.on('userJoinedRoom', data => {
-        connectToRemotePeer(data.offer, stream)
+        connectToRemotePeer(data, stream)
       })
     })
   })
 </script>
-<%- include('partials/footer.ejs') %> 
+</body>
+</html>
