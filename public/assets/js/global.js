@@ -91,7 +91,7 @@ function redirect(path) {
 window.addEventListener('load', async function(e) {
   const urlSegments = window.location.pathname.split('/')
   const rootPath = urlSegments[1]
-  const restricted = ['home', 'classroom', 'user', 'rooms']
+  const restricted = ['home', 'classroom', 'user']
   const free = ['', 'login', 'register']
   try {
     const user = JSON.parse(localStorage.getItem('session'))
