@@ -60,8 +60,10 @@ video {
       const video = document.createElement('video')
 
       call.on('stream', remoteStream => {
-        if (data.roomData.host._id === data.roomData.client._id) {
-          addVideoStream(video, remoteStream, 'host')
+        if (data.client) {
+          if (data.roomData.host._id === data.roomData.client._id) {
+            addVideoStream(video, remoteStream, 'host')
+          }
         }
         addVideoStream(video, remoteStream)
       })
@@ -105,16 +107,16 @@ video {
         })
       })
     } else {
+      console.log('ok')
       navigator.mediaDevices.getUserMedia({
         video: false,
-        audio: false
+        audio: true
       }).then(stream => {
         localPeer.on('call', call => {
           call.answer(stream)
           const video = document.createElement('video')
           
           call.on('stream', localStream => {
-            console.log(session)
             addVideoStream(video, localStream)
           })
         })

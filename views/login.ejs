@@ -47,8 +47,9 @@
     </div>
   </div>
 </div>
-
+<%- include('partials/scripts.ejs') %> 
 <script>
+document.addEventListener('DOMContentLoaded', function(e) {
   const form = document.querySelector('#login-form')
   const formData = {}
   const inputs = form.querySelectorAll('input')
@@ -73,6 +74,7 @@
       console.log(error)
     })
   })
+})
 </script>
 
 <%- include('partials/footer.ejs') %>
