@@ -21,6 +21,15 @@ video {
 <script>
   const ROOM_ID = "<%= roomId %>"
   const roomData = JSON.parse('<%- JSON.stringify(room) %>')
+  let clientData = null
+
+  if (localStorage.getItem('session')) {
+    try {
+      clientData = JSON.parse(localStorage.getItem('session'))
+    } catch(e) {
+      clientData = null
+    }
+  }
   
   document.addEventListener('DOMContentLoaded', e => {
     const socket = io('/')
@@ -68,31 +77,53 @@ video {
      */
     localPeer.on('open', offer => {
       Object.assign(roomData, {
-        client: JSON.parse(localStorage.getItem('session'))
+        client: clientData
       })
       socket.emit('userJoinRoom', {roomData, offer})
     })
 
-    navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true
-    }).then(stream => {
-      addVideoStream(localVideo, stream)
-      const session = JSON.parse(localStorage.getItem('session'))
+    if (clientData) {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      }).then(stream => {
+        addVideoStream(localVideo, stream)
+        const session = JSON.parse(localStorage.getItem('session'))
 
-      localPeer.on('call', call => {
-        call.answer(stream)
-        const video = document.createElement('video')
-        call.on('stream', localStream => {
-          console.log(session)
-          addVideoStream(video, localStream)
+        localPeer.on('call', call => {
+          call.answer(stream)
+          const video = document.createElement('video')
+          
+          call.on('stream', localStream => {
+            console.log(session)
+            addVideoStream(video, localStream)
+          })
+        })
+
+        socket.on('userJoinedRoom', data => {
+          connectToRemotePeer(data, stream)
         })
       })
+    } else {
+      navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: false
+      }).then(stream => {
+        localPeer.on('call', call => {
+          call.answer(stream)
+          const video = document.createElement('video')
+          
+          call.on('stream', localStream => {
+            console.log(session)
+            addVideoStream(video, localStream)
+          })
+        })
 
-      socket.on('userJoinedRoom', data => {
-        connectToRemotePeer(data, stream)
+        socket.on('userJoinedRoom', data => {
+          connectToRemotePeer(data, stream)
+        })
       })
-    })
+    }
   })
 </script>
 </body>
